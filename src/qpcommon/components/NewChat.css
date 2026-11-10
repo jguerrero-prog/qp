@@ -1,0 +1,25 @@
+.new-chat-description p {
+  margin: 0;
+}
+
+.new-chat-description p + p {
+  margin-block-start: var(--space-2);
+}
+
+.new-chat-prompts {
+  padding: 0;
+  list-style: none;
+}
+
+.new-chat-prompts > li {
+  max-inline-size: 100%;
+}
+
+/* A prompt longer than a narrow screen wraps instead of running off it. */
+.new-chat-prompts .ns-button {
+  max-inline-size: 100%;
+  block-size: auto;
+  min-block-size: var(--button-height-md);
+  padding-block: var(--space-1);
+  white-space: normal;
+}

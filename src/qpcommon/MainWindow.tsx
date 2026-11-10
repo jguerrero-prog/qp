@@ -16,6 +16,8 @@ export type Preferences = {
   assistantName: string;
   getAssistantSystemPrompt: () => Promise<string>;
   assistantDisplayInfo: any;
+  /** The new chat's title; "Ask {assistantName}" when unset. */
+  emptyStateTitle?: string;
   suggestedPrompts: string[];
   requiresJupyter: boolean;
 };

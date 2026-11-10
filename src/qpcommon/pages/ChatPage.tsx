@@ -18,6 +18,7 @@ import AssistantMessageItem, {
 } from "../components/AssistantMessageItem";
 import ChatInput from "../components/ChatInput";
 import MarkdownContent from "../components/MarkdownContent";
+import NewChat from "../components/NewChat";
 import SettingsDialog from "../components/SettingsDialog";
 import ToolPermissionPrompt from "../components/ToolPermissionPrompt";
 import UsageDisplay from "../components/UsageDisplay";
@@ -516,36 +517,17 @@ const ChatPage: FunctionComponent<ChatPageProps> = ({
               )}
             </div>
           )}
-          {
-            <span
-              style={{
-                display: "block",
-                textAlign: "center",
-                margin: "10px 20px",
-                color: "#666",
-                fontSize: "0.9rem",
-              }}
-            >
-              {preferences.assistantDisplayInfo}
-            </span>
-          }
-          {chat.messages.length === 0 &&
-          preferences.suggestedPrompts.length > 0 ? (
-            <div className="suggested-prompts-container">
-              <h3 className="suggested-prompts-title">Suggested prompts:</h3>
-              <div className="suggested-prompts-grid">
-                {preferences.suggestedPrompts.map((prompt, index) => (
-                  <button
-                    key={index}
-                    className="suggested-prompt-button"
-                    onClick={() => handleSuggestedPromptClick(prompt)}
-                    disabled={responding}
-                  >
-                    {prompt}
-                  </button>
-                ))}
-              </div>
-            </div>
+          {isEmpty ? (
+            <NewChat
+              title={
+                preferences.emptyStateTitle ??
+                `Ask ${preferences.assistantName}`
+              }
+              description={preferences.assistantDisplayInfo}
+              prompts={preferences.suggestedPrompts}
+              onPrompt={handleSuggestedPromptClick}
+              disabled={responding}
+            />
           ) : (
             <>
               {allMessagesIncludingPartialResponse.map((xx, index) => (
@@ -639,11 +621,12 @@ const ChatPage: FunctionComponent<ChatPageProps> = ({
           )}
 
         <ChatInput
+          label={`Ask ${preferences.assistantName}`}
           value={newPrompt}
           onChange={setNewPrompt}
           onSubmit={handleSubmit}
+          working={responding}
           disabled={
-            responding ||
             chatDisabledInfo.isDisabled ||
             !!error ||
             (requiresApiKey && !hasApiKey)

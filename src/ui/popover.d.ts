@@ -7,6 +7,7 @@ declare module "react" {
   }
   interface ButtonHTMLAttributes<T> extends HTMLAttributes<T> {
     popovertarget?: string;
+    popoverTarget?: string;
   }
 }
 

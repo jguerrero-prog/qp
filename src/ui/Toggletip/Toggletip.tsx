@@ -1,5 +1,6 @@
 import { useId, useRef, type ReactNode } from "react";
 import { IconButton } from "../IconButton/IconButton";
+import { popoverTargetProps } from "../popover/popoverTargetProps";
 import { usePopover } from "../popover/usePopover";
 import "./Toggletip.css";
 
@@ -25,7 +26,7 @@ export function Toggletip({ title, children }: ToggletipProps) {
         variant="ghost"
         size="sm"
         tooltip={false}
-        popovertarget={id}
+        {...popoverTargetProps(id)}
         aria-expanded={open}
       />
       <div id={id} ref={panel} popover="auto" className="ns-toggletip-panel">

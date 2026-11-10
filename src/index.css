@@ -1,21 +1,39 @@
 :root {
-  --primary-color: #0066cc;
-  --secondary-color: #f5f5f5;
-  --text-color: #333;
-  --border-color: #ddd;
-  --error-color: #dc3545;
-  --success-color: #28a745;
+  --primary-color: var(--action-primary);
+  --secondary-color: var(--surface-page);
+  --text-color: var(--text-default);
+  --border-color: var(--border-subtle);
+  --error-color: var(--status-error-text);
+  --success-color: var(--status-success-text);
 }
 
 body {
   margin: 0;
-  font-family:
-    system-ui,
-    -apple-system,
-    sans-serif;
-  color: var(--text-color);
-  background: var(--secondary-color);
+  font: var(--type-body);
+  letter-spacing: var(--type-body-letter-spacing);
+  color: var(--text-default);
+  background: var(--surface-page);
   overflow: hidden;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  letter-spacing: inherit;
+}
+
+:focus-visible {
+  outline: var(--border-width-2) solid var(--border-focus);
+  outline-offset: var(--space-0-5);
+}
+
+code,
+kbd,
+samp,
+pre {
+  font-family: var(--font-family-mono);
 }
 
 .app {

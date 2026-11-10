@@ -1,6 +1,7 @@
 import { useCallback, useId, useRef, type KeyboardEvent } from "react";
 import { Button, type ButtonSize, type ButtonVariant } from "../Button/Button";
 import type { IconName } from "../Icon/Icon";
+import { popoverTargetProps } from "../popover/popoverTargetProps";
 import { usePopover } from "../popover/usePopover";
 import "./Menu.css";
 
@@ -63,7 +64,7 @@ export function Menu({
         variant={variant}
         size={size}
         icon={icon}
-        popovertarget={id}
+        {...popoverTargetProps(id)}
         aria-haspopup="menu"
         aria-expanded={open}
       >

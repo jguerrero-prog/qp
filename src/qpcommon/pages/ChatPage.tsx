@@ -1,8 +1,10 @@
 import { Box } from "@mui/material";
+import { Badge, Button, InlineMessage, Tooltip, useToast } from "@ui";
 import {
   FunctionComponent,
   useCallback,
   useEffect,
+  useId,
   useMemo,
   useRef,
   useState,
@@ -23,10 +25,9 @@ import { saveChat } from "../interface/interface";
 import { useJupyterConnectivity } from "../jupyter/JupyterConnectivity";
 import { Chat, ChatMessage, QPTool } from "../types";
 import { getStoredApiKey } from "../utils/apiKeyStorage";
+import "./ChatPage.css";
 
 interface ChatPageProps {
-  width: number;
-  height: number;
   chatId: string;
   getTools: (chat: Chat) => Promise<QPTool[]>;
   preferences: Preferences;
@@ -34,8 +35,6 @@ interface ChatPageProps {
 
 const ChatPage: FunctionComponent<ChatPageProps> = ({
   chatId: chatIdProp,
-  width,
-  height,
   getTools,
   preferences,
 }) => {
@@ -95,17 +94,13 @@ const ChatPage: FunctionComponent<ChatPageProps> = ({
     error,
     toolsForChat,
     clearChat,
-    chatDispatch
-  } = useChat(
-    chatId,
-    setChatId,
-    getTools,
-    preferences,
-    toolExecutionContext,
-  );
+    chatDispatch,
+  } = useChat(chatId, setChatId, getTools, preferences, toolExecutionContext);
   const [newPrompt, setNewPrompt] = useState<string>("");
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
   const conversationRef = useRef<HTMLDivElement>(null);
+  const toast = useToast();
+  const emptyReasonId = useId();
 
   // make sure we never generate the initial response more than once
   const generatedInitialResponse = useRef(false);
@@ -261,18 +256,24 @@ const ChatPage: FunctionComponent<ChatPageProps> = ({
       if (message.role === "user") {
         lines.push(`## User`);
         lines.push(``);
-        const content = typeof message.content === "string"
-          ? message.content
-          : message.content.map(part => part.type === "text" ? part.text : "[Image]").join("\n");
+        const content =
+          typeof message.content === "string"
+            ? message.content
+            : message.content
+                .map((part) => (part.type === "text" ? part.text : "[Image]"))
+                .join("\n");
         lines.push(content);
         lines.push(``);
       } else if (message.role === "assistant") {
         lines.push(`## Assistant`);
         lines.push(``);
         if (message.content) {
-          const content = typeof message.content === "string"
-            ? message.content
-            : message.content.map(part => part.type === "text" ? part.text : "[Image]").join("\n");
+          const content =
+            typeof message.content === "string"
+              ? message.content
+              : message.content
+                  .map((part) => (part.type === "text" ? part.text : "[Image]"))
+                  .join("\n");
           lines.push(content);
         }
         if (message.tool_calls && message.tool_calls.length > 0) {
@@ -288,9 +289,10 @@ const ChatPage: FunctionComponent<ChatPageProps> = ({
         lines.push(``);
         lines.push("```");
         // Truncate very long tool outputs
-        const content = message.content.length > 2000
-          ? message.content.substring(0, 2000) + "\n... (truncated)"
-          : message.content;
+        const content =
+          message.content.length > 2000
+            ? message.content.substring(0, 2000) + "\n... (truncated)"
+            : message.content;
         lines.push(content);
         lines.push("```");
         lines.push(``);
@@ -303,7 +305,9 @@ const ChatPage: FunctionComponent<ChatPageProps> = ({
     lines.push(`**Total Usage:**`);
     lines.push(`- Prompt tokens: ${chat.totalUsage.promptTokens}`);
     lines.push(`- Completion tokens: ${chat.totalUsage.completionTokens}`);
-    lines.push(`- Estimated cost: $${chat.totalUsage.estimatedCost.toFixed(4)}`);
+    lines.push(
+      `- Estimated cost: $${chat.totalUsage.estimatedCost.toFixed(4)}`,
+    );
 
     const transcript = lines.join("\n");
 
@@ -317,7 +321,8 @@ const ChatPage: FunctionComponent<ChatPageProps> = ({
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-  }, [chat, chatId]);
+    toast.show({ status: "success", message: "Transcript downloaded" });
+  }, [chat, chatId, toast]);
 
   const handleFeedbackUpdate = useCallback(
     (
@@ -414,109 +419,65 @@ const ChatPage: FunctionComponent<ChatPageProps> = ({
     );
   }
 
+  const isEmpty = chat.messages.length === 0;
+  const emptyReason = "Available after the first message";
+  const headerAction = (
+    label: string,
+    icon: "add" | "download",
+    onClick: () => void,
+  ) => {
+    const button = (
+      <Button
+        variant="secondary"
+        size="sm"
+        icon={icon}
+        disabled={isEmpty}
+        aria-describedby={isEmpty ? emptyReasonId : undefined}
+        onClick={onClick}
+      >
+        {label}
+      </Button>
+    );
+    return isEmpty ? <Tooltip label={emptyReason}>{button}</Tooltip> : button;
+  };
+
   return (
-    <div
-      style={{
-        position: "absolute",
-        top: 0,
-        left: 0,
-        width: width,
-        height: height,
-      }}
-    >
+    <div className="chat-page">
       <div className="chat-container">
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: "12px",
-            margin: "8px 20px",
-          }}
-        >
-          <div style={{ display: "flex", gap: "8px" }}>
-            <button
-              onClick={handleNewChat}
-              className="new-chat-button"
-              disabled={chat.messages.length === 0}
-              style={{
-                padding: "0.4rem 1rem",
-                fontSize: "0.875rem",
-                borderRadius: "6px",
-                flexShrink: 0,
-                opacity: chat.messages.length === 0 ? 0.5 : 1,
-                cursor:
-                  chat.messages.length === 0
-                    ? "not-allowed"
-                    : "pointer",
-              }}
-            >
-              + New Chat
-            </button>
-            <button
-              onClick={handleDownloadTranscript}
-              className="new-chat-button"
-              disabled={chat.messages.length === 0}
-              style={{
-                padding: "0.4rem 1rem",
-                fontSize: "0.875rem",
-                borderRadius: "6px",
-                flexShrink: 0,
-                opacity: chat.messages.length === 0 ? 0.5 : 1,
-                cursor:
-                  chat.messages.length === 0
-                    ? "not-allowed"
-                    : "pointer",
-              }}
-              title="Download chat transcript as Markdown"
-            >
-              ⬇️ Download
-            </button>
+        <div className="chat-title-row">
+          <div className="chat-title">
+            <h1 className="chat-title-text">{preferences.assistantName}</h1>
+            <Badge status="neutral">Experimental</Badge>
           </div>
-          <a
-            href="https://github.com/magland/qp"
-            target="_blank"
-            rel="noopener noreferrer"
-            title="View source code and report issues"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              padding: "4px",
-              opacity: 0.6,
-              transition: "opacity 0.2s",
-              textDecoration: "none",
-              color: "inherit",
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")}
-            onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.6")}
-          >
-            <svg
-              height="24"
-              width="24"
-              viewBox="0 0 16 16"
-              fill="currentColor"
-              style={{ display: "block" }}
+          <div className="chat-title-actions">
+            {headerAction("New chat", "add", handleNewChat)}
+            {headerAction("Download", "download", handleDownloadTranscript)}
+            <Button
+              variant="ghost"
+              size="sm"
+              icon="logo--github"
+              href="https://github.com/magland/qp"
+              target="_blank"
+              rel="noopener noreferrer"
             >
-              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
-            </svg>
-          </a>
+              Source on GitHub
+            </Button>
+            {isEmpty && (
+              <span id={emptyReasonId} className="ns-visually-hidden">
+                {emptyReason}
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div className="chat-notice">
+          <InlineMessage status="info">
+            Conversations are saved to help develop {preferences.assistantName}.
+            Don’t share personal or sensitive information.
+          </InlineMessage>
         </div>
 
         <div className="conversation-area" ref={conversationRef}>
-          <div
-            style={{
-              padding: "12px",
-              margin: "10px 20px",
-              backgroundColor: "#e0f7fa",
-              border: "2px solid #4dd0e1",
-              borderRadius: "4px",
-              color: "#006064",
-              fontWeight: "bold",
-              textAlign: "center",
-            }}
-          >
-            This conversation is saved for internal development purposes. Do not share personal or sensitive information.
-          </div>
           {preferences.requiresJupyter && (
             <div
               style={{
@@ -682,44 +643,21 @@ const ChatPage: FunctionComponent<ChatPageProps> = ({
           }
         />
 
-        <div
-          style={{
-            padding: "0px 0px",
-            backgroundColor: "#f5f5f5",
-            borderTop: "1px solid #ddd",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: "16px",
-            fontSize: "0.8rem",
-          }}
-        >
+        <footer className="chat-footer">
           <UsageDisplay
             model={chat.model}
             setModel={setChatModel}
             totalUsage={chat.totalUsage}
           />
-
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
+            icon="settings"
             onClick={() => setIsSettingsOpen(true)}
-            style={{
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              fontSize: "1.4rem",
-              padding: "4px",
-              display: "flex",
-              alignItems: "center",
-              opacity: 0.7,
-              transition: "opacity 0.2s",
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")}
-            onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.7")}
-            title="Settings"
           >
-            ⚙️
-          </button>
-        </div>
+            Settings
+          </Button>
+        </footer>
       </div>
 
       <SettingsDialog

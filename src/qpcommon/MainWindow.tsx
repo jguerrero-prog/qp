@@ -13,6 +13,7 @@ type MainWindowProps = {
 };
 
 export type Preferences = {
+  assistantName: string;
   getAssistantSystemPrompt: () => Promise<string>;
   assistantDisplayInfo: any;
   suggestedPrompts: string[];
@@ -67,8 +68,6 @@ const MainWindow: FunctionComponent<MainWindowProps> = ({
           >
             <ChatPage
               key="new-chat" // Force remount when switching to new chat
-              width={windowDimensions.width}
-              height={windowDimensions.height}
               chatId=""
               getTools={getTools}
               preferences={preferences}
@@ -85,8 +84,6 @@ const MainWindow: FunctionComponent<MainWindowProps> = ({
           >
             <ChatPage
               key={chatId} // Force remount when switching chats
-              width={windowDimensions.width}
-              height={windowDimensions.height}
               chatId={chatId || ""}
               getTools={getTools}
               preferences={preferences}

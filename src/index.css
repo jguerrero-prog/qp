@@ -181,7 +181,8 @@ header h1 {
   margin-top: 1rem;
 }
 
-button {
+/* Legacy button defaults; design system controls (ns- classes) style themselves. */
+button:where(:not([class^="ns-"], [class*=" ns-"])) {
   padding: 0.5rem 1rem;
   background: var(--primary-color);
   color: white;
@@ -190,7 +191,7 @@ button {
   cursor: pointer;
 }
 
-button[type="button"] {
+button[type="button"]:where(:not([class^="ns-"], [class*=" ns-"])) {
   background: var(--secondary-color);
   color: var(--text-color);
 }
@@ -531,15 +532,6 @@ button[type="button"] {
   font-size: 1.1rem;
 }
 
-.usage-display {
-  color: #666;
-  text-align: right;
-  margin-top: 0.3rem;
-  margin-bottom: 0.3rem;
-  padding: 0 1rem;
-  opacity: 0.8;
-}
-
 /* Responsive Design */
 @media (max-width: 768px) {
   .chat-container {
@@ -629,16 +621,6 @@ button[type="button"] {
 }
 
 /* Model Selection Dialog */
-.model-name-clickable {
-  cursor: pointer;
-  text-decoration: underline;
-  transition: color 0.2s ease;
-}
-
-.model-name-clickable:hover {
-  color: var(--primary-color);
-}
-
 .model-dialog-overlay {
   position: fixed;
   top: 0;

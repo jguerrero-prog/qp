@@ -1,0 +1,12 @@
+.ns-field-input,
+.ns-field-unit {
+  font: var(--type-body-sm);
+}
+
+.ns-field-unit {
+  color: var(--text-muted);
+}
+
+.ns-field-box:has(.ns-field-input:disabled) .ns-field-unit {
+  color: var(--text-disabled);
+}

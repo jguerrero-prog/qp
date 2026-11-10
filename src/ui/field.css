@@ -1,4 +1,4 @@
-/* The field shared by TextInput, Select and SearchField: label, frame and message. */
+/* The field shared by TextInput, TextArea, Select and SearchField: label, frame and message. */
 .ns-field {
   display: grid;
   gap: var(--space-1);
@@ -55,6 +55,10 @@
   color: var(--text-default);
   background: transparent;
   border: 0;
+}
+
+.ns-field-input {
+  font: var(--type-body-sm);
 }
 
 /* The frame shows focus, so the control inside never draws a ring of its own. */

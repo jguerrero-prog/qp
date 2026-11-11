@@ -1,4 +1,4 @@
-import { FunctionComponent, useEffect, useRef, useState } from "react";
+import { FunctionComponent, useEffect, useId, useState } from "react";
 import { Button, Dialog, TextInput, useToast } from "@ui";
 import {
   getStoredApiKey,
@@ -8,7 +8,6 @@ import {
 } from "../utils/apiKeyStorage";
 import JupyterConfigurationView from "../jupyter/JupyterConfigurationView";
 import { Preferences } from "../MainWindow";
-import { useConfirmDisabled } from "./useConfirmDisabled";
 import "./SettingsDialog.css";
 
 interface SettingsDialogProps {
@@ -26,8 +25,7 @@ const SettingsDialog: FunctionComponent<SettingsDialogProps> = ({
   const [apiKey, setApiKey] = useState("");
   const [showApiKey, setShowApiKey] = useState(false);
   const [storedKey, setStoredKey] = useState<string | null>(null);
-  const keySection = useRef<HTMLDivElement>(null);
-  useConfirmDisabled(keySection, !apiKey.trim());
+  const helperId = useId();
 
   useEffect(() => {
     if (!isOpen) return;
@@ -58,8 +56,9 @@ const SettingsDialog: FunctionComponent<SettingsDialogProps> = ({
       title="Settings"
       confirmLabel="Save"
       onConfirm={handleSave}
+      confirmDisabled={!apiKey.trim()}
     >
-      <div ref={keySection} className="settings-key">
+      <div className="settings-key">
         <TextInput
           type="password"
           label="OpenRouter API key"
@@ -68,13 +67,14 @@ const SettingsDialog: FunctionComponent<SettingsDialogProps> = ({
           placeholder="sk-or-v1-..."
           autoComplete="off"
           spellCheck={false}
+          aria-describedby={helperId}
           reveal={{
             shown: showApiKey,
             onShownChange: setShowApiKey,
             name: "API key",
           }}
         />
-        <p className="settings-caption">
+        <p id={helperId} className="settings-caption">
           Needed for premium models. Get a key at{" "}
           <a
             href="https://openrouter.ai/keys"

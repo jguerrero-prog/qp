@@ -80,8 +80,11 @@ const setup = (requiresJupyter = false) => {
 };
 
 describe("SettingsDialog", () => {
-  it("hides the key until Show API key is pressed", () => {
+  it("describes the key field and hides the key until Show API key is pressed", () => {
     const { field } = setup();
+    expect(field).toHaveAccessibleDescription(
+      "Needed for premium models. Get a key at openrouter.ai/keys. Saved in this browser only.",
+    );
     expect(field).toHaveAttribute("type", "password");
     fireEvent.click(screen.getByRole("button", { name: "Show API key" }));
     expect(field).toHaveAttribute("type", "text");

@@ -1,11 +1,4 @@
-import {
-  FunctionComponent,
-  useCallback,
-  useRef,
-  useState,
-  type HTMLAttributes,
-  type SyntheticEvent,
-} from "react";
+import { FunctionComponent, useCallback, useState } from "react";
 import {
   Button,
   CodeBlock,
@@ -20,7 +13,6 @@ import {
 import { useJupyterConnectivity } from "./JupyterConnectivity";
 import { testPythonSession, TestResult } from "./pythonSessionTester";
 import { JupyterServer, JupyterServerConfig } from "./types";
-import { useConfirmDisabled } from "../components/useConfirmDisabled";
 import "./JupyterConfigurationView.css";
 
 type JupyterConfigurationViewProps = {
@@ -28,14 +20,6 @@ type JupyterConfigurationViewProps = {
 };
 
 type ServerDialog = "add" | "token" | "remove" | null;
-
-// React passes a nested dialog's close and cancel up to Settings, which would close it too.
-const keepInside = (event: SyntheticEvent) => event.stopPropagation();
-const nestedDialogs = {
-  className: "jupyter-config-dialogs",
-  onClose: keepInside,
-  onCancel: keepInside,
-} as HTMLAttributes<HTMLDivElement>;
 
 const serverLabel = (server: JupyterServer) =>
   server.name ? `${server.url} (${server.name})` : server.url;
@@ -61,8 +45,6 @@ const JupyterConfigurationView: FunctionComponent<
   const [newServerUrl, setNewServerUrl] = useState("");
   const [newServerName, setNewServerName] = useState("");
   const [instructionsOpen, setInstructionsOpen] = useState(false);
-  const addFields = useRef<HTMLDivElement>(null);
-  useConfirmDisabled(addFields, !newServerUrl);
 
   const servers = serverConfig?.servers ?? [];
   const selectedUrl = serverConfig?.selectedServerUrl ?? jupyterServerUrl;
@@ -75,6 +57,7 @@ const JupyterConfigurationView: FunctionComponent<
     serverOptions.unshift({
       value: selectedUrl,
       label: "Choose a server",
+      disabled: true,
     });
 
   const updateConfig = useCallback(
@@ -257,67 +240,66 @@ const JupyterConfigurationView: FunctionComponent<
         </Disclosure>
       </div>
 
-      <div {...nestedDialogs}>
-        <Dialog
-          open={dialog === "add"}
-          onClose={closeDialog}
-          title="Add server"
-          confirmLabel="Add"
-          onConfirm={handleAddServer}
-          size="sm"
-        >
-          <div ref={addFields} className="jupyter-config-fields">
-            <TextInput
-              type="url"
-              label="Server URL"
-              value={newServerUrl}
-              onChange={setNewServerUrl}
-              placeholder="http://localhost:8890"
-            />
-            <TextInput
-              label="Name (optional)"
-              value={newServerName}
-              onChange={setNewServerName}
-              placeholder="My server"
-            />
-          </div>
-        </Dialog>
-        <Dialog
-          open={dialog === "token"}
-          onClose={closeDialog}
-          title="Set token"
-          confirmLabel="Save"
-          onConfirm={handleTokenSubmit}
-          size="sm"
-        >
+      <Dialog
+        open={dialog === "add"}
+        onClose={closeDialog}
+        title="Add server"
+        confirmLabel="Add"
+        onConfirm={handleAddServer}
+        confirmDisabled={!newServerUrl}
+        size="sm"
+      >
+        <div className="jupyter-config-fields">
           <TextInput
-            type="password"
-            label="Token"
-            value={tokenInput}
-            onChange={setTokenInput}
-            helper={`For ${selectedUrl}`}
-            autoComplete="off"
-            reveal={{
-              shown: showToken,
-              onShownChange: setShowToken,
-              name: "token",
-            }}
+            type="url"
+            label="Server URL"
+            value={newServerUrl}
+            onChange={setNewServerUrl}
+            placeholder="http://localhost:8890"
           />
-        </Dialog>
-        <Dialog
-          open={dialog === "remove"}
-          onClose={closeDialog}
-          title="Remove server?"
-          confirmLabel="Remove"
-          onConfirm={handleRemoveConfirm}
-          size="sm"
-          kind="destructive"
-        >
-          <p className="jupyter-config-break">
-            {selectedUrl} will be removed from your servers.
-          </p>
-        </Dialog>
-      </div>
+          <TextInput
+            label="Name (optional)"
+            value={newServerName}
+            onChange={setNewServerName}
+            placeholder="My server"
+          />
+        </div>
+      </Dialog>
+      <Dialog
+        open={dialog === "token"}
+        onClose={closeDialog}
+        title="Set token"
+        confirmLabel="Save"
+        onConfirm={handleTokenSubmit}
+        size="sm"
+      >
+        <TextInput
+          type="password"
+          label="Token"
+          value={tokenInput}
+          onChange={setTokenInput}
+          helper={`For ${selectedUrl}`}
+          autoComplete="off"
+          reveal={{
+            shown: showToken,
+            onShownChange: setShowToken,
+            name: "token",
+          }}
+        />
+      </Dialog>
+      <Dialog
+        open={dialog === "remove"}
+        onClose={closeDialog}
+        title="Remove server?"
+        confirmLabel="Remove"
+        onConfirm={handleRemoveConfirm}
+        size="sm"
+        kind="destructive"
+      >
+        <p className="jupyter-config-break">
+          {selectedUrl} will be removed from your servers.
+        </p>
+      </Dialog>
     </section>
   );
 };

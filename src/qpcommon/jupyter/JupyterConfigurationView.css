@@ -54,7 +54,3 @@
   margin: 0;
   overflow-wrap: anywhere;
 }
-
-.jupyter-config-dialogs {
-  display: contents;
-}

@@ -31,6 +31,7 @@ jobs:
         env:
           VITE_APP_NAME: neurosift-chat
           VITE_PREVIEW: "1"
+          VITE_NEUROSIFT_URL: https://jguerrero-prog.github.io/neurosift/app/
         run: npx vite build --base "/${{ github.event.repository.name }}/"
 
       # GitHub Pages serves 404.html for unknown paths, so /chat/<id> loads the app too.

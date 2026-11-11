@@ -21,6 +21,10 @@ const preferences: Preferences = {
   emptyStateLead:
     "Search the archives, read NWB files and make figures, by asking in plain words.",
   logo: "neurosift-logo.png",
+  backLink: {
+    label: "Back to Neurosift",
+    href: import.meta.env.VITE_NEUROSIFT_URL || "https://neurosift.app",
+  },
   getAssistantSystemPrompt: async () => neurosiftChatAssistantDescription,
   assistantDisplayInfo:
     "Assistant for exploring and querying neuroscience datasets across DANDI Archive, OpenNeuro, and EBRAINS repositories, with capabilities to search datasets, analyze NWB files, and generate data visualizations.",

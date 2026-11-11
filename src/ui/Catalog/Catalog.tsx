@@ -6,6 +6,7 @@ import { SearchField } from "../SearchField/SearchField";
 import { SegmentedControl } from "../SegmentedControl/SegmentedControl";
 import { Select, type SelectOption } from "../Select/Select";
 import "../base.css";
+import "../row-list.css";
 import "./Catalog.css";
 
 const MODES = [
@@ -254,13 +255,10 @@ interface RecentItem {
 /** Datasets opened in this browser, newest first, on Home. */
 export function RecentlyOpened({ items }: { items: RecentItem[] }) {
   return (
-    <ul className="ns-catalog-recent" aria-label="Recently opened">
+    <ul className="ns-row-list" aria-label="Recently opened">
       {items.map((item) => (
-        <li
-          key={`${item.archive}-${item.id}`}
-          className="ns-catalog-recent-row"
-        >
-          <a className="ns-catalog-recent-link" href={item.href}>
+        <li key={`${item.archive}-${item.id}`} className="ns-row-list-row">
+          <a className="ns-row-list-action" href={item.href}>
             <span className="ns-catalog-id">{item.id}</span>
             <span className="ns-catalog-recent-title">{item.title}</span>
           </a>

@@ -176,4 +176,25 @@ describe("RecentlyOpened", () => {
     const list = screen.getByRole("list", { name: "Recently opened" });
     expect(within(list).getByRole("link", { name: /000673/ })).toBeTruthy();
   });
+
+  it("uses the same rows as the Prompt list", () => {
+    render(
+      <RecentlyOpened
+        items={[
+          {
+            archive: "DANDI",
+            id: "000673",
+            title: "Control of working memory",
+            href: "/dandiset/000673",
+          },
+        ]}
+      />,
+    );
+    const list = screen.getByRole("list", { name: "Recently opened" });
+    expect(list.className).toBe("ns-row-list");
+    expect(within(list).getByRole("listitem").className).toBe(
+      "ns-row-list-row",
+    );
+    expect(within(list).getByRole("link").className).toBe("ns-row-list-action");
+  });
 });

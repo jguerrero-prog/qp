@@ -11,7 +11,8 @@ interface TextAreaProps extends Omit<
   label: string;
   value: string;
   onChange: (value: string) => void;
-  size?: "md" | "sm";
+  /** Large matches the Large Search field, for a message box. */
+  size?: "lg" | "md" | "sm";
   helper?: string;
   error?: string;
   hideLabel?: boolean;
@@ -54,7 +55,7 @@ export function TextArea({
         className="ns-field-input ns-text-area"
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        {...fieldAria(id, helper, error)}
+        {...fieldAria(id, helper, error, native["aria-describedby"])}
       />
     </Field>
   );

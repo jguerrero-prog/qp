@@ -10,7 +10,9 @@
   color: var(--text-default);
 }
 
+/* The edge is drawn inside the height, as in Figma. */
 :is(.ns-field-box, .ns-search) {
+  box-sizing: border-box;
   display: flex;
   gap: var(--space-2);
   align-items: center;
@@ -24,6 +26,11 @@
 .ns-field-box {
   block-size: var(--button-height-md);
   padding: 0 var(--space-3);
+}
+
+/* Large uses the Large Search field's height and type. */
+.ns-field--lg .ns-field-box {
+  block-size: var(--input-height-lg);
 }
 
 .ns-field--sm .ns-field-box {
@@ -59,6 +66,10 @@
 
 .ns-field-input {
   font: var(--type-body-sm);
+}
+
+.ns-field--lg .ns-field-input {
+  font: var(--type-body);
 }
 
 /* The frame shows focus, so the control inside never draws a ring of its own. */

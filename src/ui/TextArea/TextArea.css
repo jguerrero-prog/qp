@@ -6,6 +6,13 @@
   padding-block: var(--space-1);
 }
 
+/* One row centers in the 40px frame; more rows keep 6px above and below. */
+.ns-field--lg .ns-field-box:has(> .ns-text-area) {
+  align-items: center;
+  min-block-size: var(--input-height-lg);
+  padding-block: calc(var(--space-1) + var(--space-0-5));
+}
+
 .ns-field--sm .ns-field-box:has(> .ns-text-area) {
   min-block-size: var(--button-height-sm);
   padding-block: 0;

@@ -3,7 +3,7 @@
 # Usage: scripts/sync-ui.sh [path to a jguerrero-prog/neurosift clone, default ../neurosift]
 set -euo pipefail
 
-NEUROSIFT_SHA=9a1e7d9294cc5d51dad583c75bdf9eedcc78805b
+NEUROSIFT_SHA=c3d37aca7b10e53a609aba1033b70d06708c0f84
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 NEUROSIFT_DIR="${1:-$ROOT/../neurosift}"
 FILES=(src/ui src/css/tokens.css src/css/fonts.css design-system/migration/count.mjs)

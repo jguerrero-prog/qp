@@ -8,6 +8,11 @@
   white-space: nowrap;
 }
 
+/* Large is Medium at the Large input's height, for Send beside a Large Text area. */
+.ns-button--lg {
+  block-size: var(--button-height-lg);
+}
+
 .ns-button--sm {
   gap: var(--space-1);
   block-size: var(--button-height-sm);

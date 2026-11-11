@@ -28,6 +28,15 @@ describe("TextArea", () => {
     );
   });
 
+  it("is Large where it matches the Large Search field", () => {
+    const { container } = render(
+      <TextArea label="Message" value="" onChange={noop} size="lg" rows={1} />,
+    );
+    expect(container.firstElementChild?.className).toBe(
+      "ns-field ns-field--lg",
+    );
+  });
+
   it("shows three rows by default", () => {
     render(<TextArea label="Notes" value="" onChange={noop} />);
     const area = screen.getByLabelText("Notes") as HTMLTextAreaElement;
@@ -86,6 +95,40 @@ describe("TextArea", () => {
       area.getAttribute("aria-describedby") ?? "",
     );
     expect(helper?.textContent).toBe("Enter sends. Shift+Enter adds a line.");
+  });
+
+  it("keeps a description the caller links, beside its own message", () => {
+    const { rerender } = render(
+      <>
+        <TextArea
+          label="Message"
+          value=""
+          onChange={noop}
+          aria-describedby="hint"
+        />
+        <p id="hint">Enter to send</p>
+      </>,
+    );
+    const area = screen.getByLabelText("Message");
+    expect(area.getAttribute("aria-describedby")).toBe("hint");
+    rerender(
+      <>
+        <TextArea
+          label="Message"
+          value=""
+          onChange={noop}
+          aria-describedby="hint"
+          error="Write a message first."
+        />
+        <p id="hint">Enter to send</p>
+      </>,
+    );
+    const ids = screen
+      .getByLabelText("Message")
+      .getAttribute("aria-describedby")
+      ?.split(" ");
+    expect(ids).toHaveLength(2);
+    expect(ids).toContain("hint");
   });
 
   it("shows an error in words with an icon, marks the field invalid and links the message", () => {

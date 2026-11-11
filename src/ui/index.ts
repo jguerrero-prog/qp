@@ -97,3 +97,5 @@ export {
   SearchRow,
   ShowMore,
 } from "./Catalog/Catalog";
+export { PromptList } from "./PromptList/PromptList";
+export type { Prompt } from "./PromptList/PromptList";

@@ -111,6 +111,25 @@ describe("CodeBlock", () => {
     ).toBeTruthy();
   });
 
+  it("shows any other language, or output, as plain text named by its title", async () => {
+    const json = `{\n  "dandiset": "000728",\n  "files": 12\n}`;
+    const { container } = render(<CodeBlock title="JSON" code={json} />);
+    expect(screen.getByText("JSON")).toBeTruthy();
+    expect(container.querySelector(".ns-code-line-number")).toBeNull();
+    expect(
+      container.querySelector(
+        ".ns-code-keyword, .ns-code-string, .ns-code-number, .ns-code-comment",
+      ),
+    ).toBeNull();
+    expect(container.querySelectorAll(".ns-code-line")).toHaveLength(4);
+    await copy("Copy JSON");
+    expect(writeText).toHaveBeenCalledWith(json);
+    cleanup();
+    render(<CodeBlock title="Output" code="$ not a prompt" />);
+    await copy("Copy Output");
+    expect(writeText).toHaveBeenLastCalledWith("$ not a prompt");
+  });
+
   it("says so when the browser won't copy", async () => {
     writeText.mockImplementation(() => Promise.reject(new Error("denied")));
     render(<CodeBlock language="python" code={SCRIPT} />);

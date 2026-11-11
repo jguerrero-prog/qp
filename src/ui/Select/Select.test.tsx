@@ -49,6 +49,28 @@ describe("Select", () => {
     expect(select.options[2].disabled).toBe(true);
   });
 
+  it("keeps a description the caller links, beside its own message", () => {
+    render(
+      <>
+        <Select
+          label="Group trials by"
+          value=""
+          onChange={noop}
+          options={GROUPS}
+          aria-describedby="hint"
+          helper="Columns of /intervals/trials."
+        />
+        <p id="hint">Each group gets its own color.</p>
+      </>,
+    );
+    const ids = screen
+      .getByRole("combobox")
+      .getAttribute("aria-describedby")
+      ?.split(" ");
+    expect(ids).toHaveLength(2);
+    expect(ids?.[0]).toBe("hint");
+  });
+
   it("reports the picked value", () => {
     const onChange = vi.fn();
     render(

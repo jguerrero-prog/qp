@@ -25,6 +25,8 @@ type ActionProps = CommonProps &
   Unstyled<ButtonHTMLAttributes<HTMLButtonElement>> & {
     href?: undefined;
     loading?: boolean;
+    /** Makes it a toggle, such as Helpful: sets aria-pressed and the pressed look. */
+    pressed?: boolean;
   };
 
 type LinkProps = CommonProps &
@@ -59,6 +61,7 @@ export function Button(props: ButtonProps) {
     icon,
     children,
     loading = false,
+    pressed,
     type = "button",
     onClick,
     ...native
@@ -73,6 +76,7 @@ export function Button(props: ButtonProps) {
       type={type}
       className={classes(variant, size)}
       aria-busy={loading || undefined}
+      aria-pressed={pressed}
       data-spinner={loading && !icon ? "center" : undefined}
       onClick={handleClick}
     >

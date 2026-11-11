@@ -53,6 +53,27 @@ describe("TextInput", () => {
     expect(helper?.textContent).toBe("Seconds from the start of the session.");
   });
 
+  it("keeps a description the caller links, beside its own message", () => {
+    render(
+      <>
+        <TextInput
+          label="API key"
+          value=""
+          onChange={noop}
+          aria-describedby="hint"
+          error="Enter a key first."
+        />
+        <p id="hint">Find it in your DANDI account.</p>
+      </>,
+    );
+    const ids = screen
+      .getByLabelText("API key")
+      .getAttribute("aria-describedby")
+      ?.split(" ");
+    expect(ids).toHaveLength(2);
+    expect(ids?.[0]).toBe("hint");
+  });
+
   it("shows an error in words with an icon, marks the field invalid and links the message", () => {
     render(
       <TextInput

@@ -41,6 +41,28 @@ describe("MultiSelect", () => {
     ).toBeTruthy();
   });
 
+  it("keeps a description the caller links, beside its helper", () => {
+    render(
+      <>
+        <MultiSelect
+          label="Neurodata types"
+          helper="Files that contain every type you choose."
+          options={TYPES}
+          value={[]}
+          onChange={vi.fn()}
+          aria-describedby="hint"
+        />
+        <p id="hint">Type to filter.</p>
+      </>,
+    );
+    const ids = screen
+      .getByRole("combobox", { name: "Neurodata types" })
+      .getAttribute("aria-describedby")
+      ?.split(" ");
+    expect(ids).toHaveLength(2);
+    expect(ids?.[0]).toBe("hint");
+  });
+
   it("matches anywhere in the name, so Series finds ElectricalSeries", () => {
     render(<Picker />);
     const input = screen.getByRole("combobox", { name: "Neurodata types" });

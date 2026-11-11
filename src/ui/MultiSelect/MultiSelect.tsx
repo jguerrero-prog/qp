@@ -56,6 +56,7 @@ interface MultiSelectProps {
   code?: boolean;
   /** What the options are, for “No types match …”. */
   noun?: string;
+  "aria-describedby"?: string;
 }
 
 /** Several values from a long list, picked by typing. Matches anywhere in the name. */
@@ -67,6 +68,7 @@ export function MultiSelect({
   onChange,
   code = false,
   noun = "options",
+  "aria-describedby": describedBy,
 }: MultiSelectProps) {
   const id = useId();
   const listId = `${id}-list`;
@@ -138,7 +140,7 @@ export function MultiSelect({
           }}
           onKeyDown={onKeyDown}
           onBlur={() => setOpen(false)}
-          {...fieldAria(id, helper)}
+          {...fieldAria(id, helper, undefined, describedBy)}
         />
         <div
           id={listId}

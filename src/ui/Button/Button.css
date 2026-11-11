@@ -33,6 +33,23 @@
   --control-fg: var(--text-on-inverse);
 }
 
+/* A pressed toggle keeps the pressed fill; Ghost gains the Secondary edge so it isn't color alone. */
+.ns-button[aria-pressed="true"]:not(:disabled) {
+  --control-bg: var(--control-bg-pressed);
+}
+
+.ns-button--ghost[aria-pressed="true"]:not(:disabled) {
+  --control-edge: var(--border-strong);
+}
+
+@media (forced-colors: active) {
+  .ns-button[aria-pressed="true"]:not(:disabled) {
+    forced-color-adjust: none;
+    color: SelectedItemText;
+    background: SelectedItem;
+  }
+}
+
 .ns-button[aria-busy="true"] {
   cursor: progress;
 }

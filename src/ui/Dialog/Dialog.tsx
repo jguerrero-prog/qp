@@ -1,4 +1,4 @@
-import { useId, useRef, type ReactNode } from "react";
+import { useId, useRef, type ReactNode, type SyntheticEvent } from "react";
 import { Button } from "../Button/Button";
 import { IconButton } from "../IconButton/IconButton";
 import { useModalDialog } from "./useModalDialog";
@@ -15,6 +15,8 @@ interface DialogProps {
   /** The verb from the title, never OK or Yes. */
   confirmLabel: string;
   onConfirm: () => void;
+  /** Disables the main action until the task can be done, such as Save with no key. */
+  confirmDisabled?: boolean;
   size?: "sm" | "md";
   kind?: "default" | "destructive";
 }
@@ -27,6 +29,7 @@ export function Dialog({
   children,
   confirmLabel,
   onConfirm,
+  confirmDisabled = false,
   size = "md",
   kind = "default",
 }: DialogProps) {
@@ -34,16 +37,21 @@ export function Dialog({
   const heading = useRef<HTMLHeadingElement>(null);
   const titleId = useId();
   useModalDialog(dialog, heading, open);
+  // React passes close and cancel to every Dialog around this one, which would close them too.
+  const dismiss = (event: SyntheticEvent) => {
+    event.stopPropagation();
+    onClose();
+  };
   if (!open) return null;
   return (
     <dialog
       ref={dialog}
       aria-labelledby={titleId}
       className={`ns-dialog ns-dialog--${size}`}
-      onClose={onClose}
+      onClose={dismiss}
       onCancel={(event) => {
         event.preventDefault();
-        onClose();
+        dismiss(event);
       }}
     >
       <div className="ns-dialog-header">
@@ -71,6 +79,7 @@ export function Dialog({
         <Button
           variant={kind === "destructive" ? "destructive" : "primary"}
           onClick={onConfirm}
+          disabled={confirmDisabled}
         >
           {confirmLabel}
         </Button>

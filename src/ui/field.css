@@ -94,12 +94,14 @@
   color: var(--status-error-text);
 }
 
-.ns-field:has(:disabled) .ns-field-label,
+/* Only a disabled control dims the field; a disabled option inside a select doesn't. */
+.ns-field:has(> .ns-field-box > :is(input, select, textarea):disabled)
+  .ns-field-label,
 .ns-field-box :disabled {
   color: var(--text-disabled);
 }
 
-.ns-field-box:has(:disabled) {
+.ns-field-box:has(> :is(input, select, textarea):disabled) {
   background: var(--action-disabled);
   border-color: var(--border-disabled);
 }

@@ -1,5 +1,6 @@
 import { Box } from "@mui/material";
 import { Badge, Button, InlineMessage, Tooltip, useToast } from "@ui";
+import { isPreview } from "../preview";
 import {
   FunctionComponent,
   useCallback,
@@ -471,6 +472,12 @@ const ChatPage: FunctionComponent<ChatPageProps> = ({
         </div>
 
         <div className="chat-notice">
+          {isPreview && (
+            <InlineMessage status="warning">
+              This is a design preview. Sending a message won’t work here yet,
+              because the chat server doesn’t accept requests from this address.
+            </InlineMessage>
+          )}
           <InlineMessage status="info">
             Conversations are saved to help develop {preferences.assistantName}.
             Don’t share personal or sensitive information.

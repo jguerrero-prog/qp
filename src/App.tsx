@@ -44,7 +44,7 @@ function App() {
   }, []);
   return (
     <ToastProvider>
-      <BrowserRouter>
+      <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, "")}>
         <MainWindow getTools={getTools} preferences={preferences} />
       </BrowserRouter>
     </ToastProvider>

@@ -22,6 +22,8 @@ export type Preferences = {
   emptyStateLead?: string;
   /** An image in public/ shown before the assistant's name. */
   logo?: string;
+  /** A link back to the app that opened this assistant, first in the top bar. */
+  backLink?: { label: string; href: string };
   suggestedPrompts: string[];
   requiresJupyter: boolean;
 };

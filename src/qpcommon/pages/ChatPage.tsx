@@ -576,6 +576,16 @@ const ChatPage: FunctionComponent<ChatPageProps> = ({
             <Badge status="neutral">Experimental</Badge>
           </div>
           <div className="chat-title-actions">
+            {preferences.backLink && (
+              <Button
+                variant="ghost"
+                size="sm"
+                icon="chevron--left"
+                href={preferences.backLink.href}
+              >
+                {preferences.backLink.label}
+              </Button>
+            )}
             {headerAction("New chat", "add", handleNewChat)}
             {headerAction("Download", "download", handleDownloadTranscript)}
             <Button

@@ -109,6 +109,72 @@ describe("Dialog", () => {
     expect(onConfirm).toHaveBeenCalledTimes(1);
   });
 
+  it("can disable its main action until the task is ready", () => {
+    const onConfirm = vi.fn();
+    const { rerender } = render(
+      <Dialog
+        open
+        onClose={vi.fn()}
+        title="Add an API key"
+        confirmLabel="Save"
+        onConfirm={onConfirm}
+        confirmDisabled
+      >
+        Paste the key from your DANDI account.
+      </Dialog>,
+    );
+    const save = screen.getByRole("button", { name: "Save" });
+    expect((save as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.click(save);
+    expect(onConfirm).not.toHaveBeenCalled();
+    expect(
+      (screen.getByRole("button", { name: "Cancel" }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(false);
+    rerender(
+      <Dialog
+        open
+        onClose={vi.fn()}
+        title="Add an API key"
+        confirmLabel="Save"
+        onConfirm={onConfirm}
+      >
+        Paste the key from your DANDI account.
+      </Dialog>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+    expect(onConfirm).toHaveBeenCalledTimes(1);
+  });
+
+  it("closing a dialog opened from another one leaves the outer one open", () => {
+    const outerClose = vi.fn();
+    const innerClose = vi.fn();
+    render(
+      <Dialog
+        open
+        onClose={outerClose}
+        title="Settings"
+        confirmLabel="Save"
+        onConfirm={vi.fn()}
+      >
+        <Dialog
+          open
+          onClose={innerClose}
+          title="Add a server"
+          confirmLabel="Add"
+          onConfirm={vi.fn()}
+        >
+          The server's URL.
+        </Dialog>
+      </Dialog>,
+    );
+    const inner = screen.getByRole("dialog", { name: "Add a server" });
+    fireEvent(inner, new Event("cancel", { cancelable: true }));
+    (inner as HTMLDialogElement).close();
+    expect(innerClose).toHaveBeenCalledTimes(2);
+    expect(outerClose).not.toHaveBeenCalled();
+  });
+
   it("moves focus to the first field when there is one", () => {
     render(
       <Dialog

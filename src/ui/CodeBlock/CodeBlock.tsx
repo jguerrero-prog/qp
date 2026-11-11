@@ -7,13 +7,21 @@ import "./CodeBlock.css";
 const LANGUAGE_NAMES = { python: "Python", shell: "Shell" } as const;
 const CONFIRM_TIME = 2000;
 
-interface CodeBlockProps {
+type CodeBlockProps = {
   code: string;
-  language: "python" | "shell";
-  /** Shown in the header in place of the language, such as the file a script loads. */
-  title?: string;
   lineNumbers?: boolean;
-}
+} & (
+  | {
+      language: "python" | "shell";
+      /** Shown in the header in place of the language, such as the file a script loads. */
+      title?: string;
+    }
+  | {
+      /** Without a language the code is plain text, named by its title, such as "JSON" or "Output". */
+      language?: undefined;
+      title: string;
+    }
+);
 
 type CopyState = "idle" | "copied" | "failed";
 
@@ -32,7 +40,7 @@ export function CodeBlock({
   }, [state]);
 
   const lines = code.split("\n");
-  const name = title ?? LANGUAGE_NAMES[language];
+  const name = language ? (title ?? LANGUAGE_NAMES[language]) : title;
   const copyText =
     language === "shell"
       ? lines.map((l) => l.replace(/^\$ /, "")).join("\n")
@@ -51,7 +59,13 @@ export function CodeBlock({
           size="sm"
           variant="ghost"
           icon={state === "copied" ? "checkmark" : "copy"}
-          aria-label={state === "copied" ? "Copied" : `Copy ${name} code`}
+          aria-label={
+            state === "copied"
+              ? "Copied"
+              : language
+                ? `Copy ${name} code`
+                : `Copy ${name}`
+          }
           onClick={copy}
         >
           {state === "copied" ? "Copied" : "Copy"}
@@ -74,7 +88,10 @@ export function CodeBlock({
                 </span>
               )}
               <span className="ns-code-text">
-                {highlight(line, language).map((token, i) =>
+                {(language
+                  ? highlight(line, language)
+                  : [{ kind: "text", text: line }]
+                ).map((token, i) =>
                   token.kind === "text" ? (
                     token.text
                   ) : (

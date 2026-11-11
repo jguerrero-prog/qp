@@ -52,7 +52,7 @@ export function Select({
         className="ns-select"
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        {...fieldAria(id, helper, error)}
+        {...fieldAria(id, helper, error, native["aria-describedby"])}
       >
         {options.map((option) => (
           <option

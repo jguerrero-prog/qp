@@ -77,6 +77,15 @@
   overflow-y: auto;
 }
 
+.conversation-area > * + * {
+  margin-block-start: var(--space-4);
+}
+
+/* Room below the last message, so it can scroll to the top of the transcript. */
+.chat-transcript-end {
+  block-size: 100%;
+}
+
 .chat-footer {
   display: flex;
   flex-wrap: wrap;

@@ -285,70 +285,6 @@ button[type="button"]:where(:not([class^="ns-"], [class*=" ns-"])) {
   display: flex;
   flex-direction: column;
 }
-.message {
-  margin-bottom: 1.5rem;
-  display: flex;
-  flex-direction: column;
-}
-
-.message-user {
-  align-items: flex-end;
-}
-
-.message-assistant {
-  align-items: flex-start;
-}
-
-.message-bubble {
-  max-width: 100%;
-  padding: 1rem 1.25rem;
-  border-radius: 18px;
-}
-
-.message-bubble-user {
-  background: #6c757d;
-  color: white;
-  border-bottom-right-radius: 6px;
-}
-
-.message-bubble-assistant {
-  background: #f1f3f4;
-  color: var(--text-color);
-  border-bottom-left-radius: 6px;
-}
-
-.partial-response {
-  background: #f8f9fa;
-  border: 1px solid var(--border-color);
-  border-radius: 18px;
-  border-bottom-left-radius: 6px;
-  padding: 1rem 1.25rem;
-  max-width: 70%;
-  margin-bottom: 1.5rem;
-  position: relative;
-}
-
-.partial-response::after {
-  content: "";
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--primary-color);
-  animation: pulse 1.5s infinite;
-  margin-left: 0.5rem;
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 0.3;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
 .loading-message {
   text-align: center;
   padding: 2rem;
@@ -369,38 +305,16 @@ button[type="button"]:where(:not([class^="ns-"], [class*=" ns-"])) {
     padding: 0;
     height: 100vh;
   }
-  .message-bubble {
-    max-width: 85%;
-  }
 }
 
 @media (max-width: 480px) {
-  .message-bubble {
-    max-width: 90%;
-    padding: 0.75rem 1rem;
-  }
   .chat-container {
     padding: 0;
   }
 }
 
-/* High contrast mode support */
-@media (prefers-contrast: high) {
-  .message-bubble-user {
-    border: 2px solid white;
-  }
-
-  .message-bubble-assistant {
-    border: 2px solid var(--text-color);
-  }
-}
-
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
-  .partial-response::after {
-    animation: none;
-  }
-
   * {
     scroll-behavior: auto !important;
   }

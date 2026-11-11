@@ -102,6 +102,32 @@ describe("Alert", () => {
     expect(retry).toHaveBeenCalledTimes(1);
   });
 
+  it("makes an action Primary when asked, and the other Secondary", () => {
+    const allow = vi.fn();
+    render(
+      <Alert
+        status="warning"
+        title="Run this code?"
+        actions={[
+          { label: "Allow", onClick: allow, primary: true },
+          { label: "Deny", onClick: vi.fn() },
+        ]}
+      >
+        The assistant wants to run a Python script.
+      </Alert>,
+    );
+    const buttons = screen.getAllByRole("button");
+    expect(buttons.map((b) => b.textContent)).toEqual(["Allow", "Deny"]);
+    expect(buttons[0].className).toBe(
+      "ns-button ns-button--primary ns-button--sm",
+    );
+    expect(buttons[1].className).toBe(
+      "ns-button ns-button--secondary ns-button--sm",
+    );
+    fireEvent.click(buttons[0]);
+    expect(allow).toHaveBeenCalledTimes(1);
+  });
+
   it("opens a link action in a new tab when asked", () => {
     render(
       <Alert

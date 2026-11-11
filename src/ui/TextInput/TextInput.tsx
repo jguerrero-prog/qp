@@ -57,7 +57,7 @@ export function TextInput({
         className="ns-field-input"
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        {...fieldAria(id, helper, error)}
+        {...fieldAria(id, helper, error, native["aria-describedby"])}
       />
       {secret && (
         <IconButton

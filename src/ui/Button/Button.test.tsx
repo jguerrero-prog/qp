@@ -99,6 +99,24 @@ describe("Button", () => {
     expect(screen.getByRole("button").dataset.spinner).toBeUndefined();
   });
 
+  it("as a toggle says whether it's pressed, and only then", () => {
+    const { rerender } = render(<Button variant="ghost">Helpful</Button>);
+    const button = screen.getByRole("button", { name: "Helpful" });
+    expect(button.hasAttribute("aria-pressed")).toBe(false);
+    rerender(
+      <Button variant="ghost" pressed={false}>
+        Helpful
+      </Button>,
+    );
+    expect(button.getAttribute("aria-pressed")).toBe("false");
+    rerender(
+      <Button variant="ghost" pressed>
+        Helpful
+      </Button>,
+    );
+    expect(button.getAttribute("aria-pressed")).toBe("true");
+  });
+
   it("is a link when it goes somewhere", () => {
     render(
       <Button href="https://dandiarchive.org" icon="launch">

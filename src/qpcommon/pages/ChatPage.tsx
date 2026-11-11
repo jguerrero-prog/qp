@@ -1,5 +1,12 @@
-import { Box } from "@mui/material";
-import { Badge, Button, InlineMessage, Tooltip, useToast } from "@ui";
+import {
+  Alert,
+  Badge,
+  Button,
+  InlineMessage,
+  Spinner,
+  Tooltip,
+  useToast,
+} from "@ui";
 import { isPreview } from "../preview";
 import {
   FunctionComponent,
@@ -13,12 +20,13 @@ import {
 import { useLocation, useNavigate } from "react-router-dom";
 import { Preferences } from "../MainWindow";
 import { CHEAP_MODELS } from "../completion/cheapModels";
+import type { Feedback } from "../components/AnswerFeedback";
 import AssistantMessageItem, {
   messageContentToString,
 } from "../components/AssistantMessageItem";
 import ChatInput from "../components/ChatInput";
-import MarkdownContent from "../components/MarkdownContent";
 import NewChat from "../components/NewChat";
+import QuestionItem from "../components/QuestionItem";
 import SettingsDialog from "../components/SettingsDialog";
 import ToolPermissionPrompt from "../components/ToolPermissionPrompt";
 import UsageDisplay from "../components/UsageDisplay";
@@ -28,6 +36,9 @@ import { useJupyterConnectivity } from "../jupyter/JupyterConnectivity";
 import { Chat, ChatMessage, QPTool } from "../types";
 import { getStoredApiKey } from "../utils/apiKeyStorage";
 import "./ChatPage.css";
+
+// A 429 reads "Too Many Requests"; the server's own limits say "rate limit" or "limit exceeded".
+const LIMIT_ERROR = /too many|rate limit|limit exceeded/i;
 
 interface ChatPageProps {
   chatId: string;
@@ -327,10 +338,7 @@ const ChatPage: FunctionComponent<ChatPageProps> = ({
   }, [chat, chatId, toast]);
 
   const handleFeedbackUpdate = useCallback(
-    (
-      messageIndex: number,
-      feedback: { thumbs?: "up" | "down"; comment?: string },
-    ) => {
+    (messageIndex: number, feedback: Feedback) => {
       if (chatDispatch) {
         chatDispatch({
           type: "update_message_feedback",
@@ -443,94 +451,54 @@ const ChatPage: FunctionComponent<ChatPageProps> = ({
     return isEmpty ? <Tooltip label={emptyReason}>{button}</Tooltip> : button;
   };
 
-  const jupyterStatus = preferences.requiresJupyter && (
-    <div
-      style={{
-        padding: "8px 12px",
-        margin: "10px 20px",
-        backgroundColor: jupyterConnectivity.jupyterServerIsAvailable
-          ? "#f0f9f4"
-          : "#fff4e5",
-        border: jupyterConnectivity.jupyterServerIsAvailable
-          ? "1px solid #c6e8d5"
-          : "1px solid #ffe0b2",
-        borderRadius: "4px",
-        color: jupyterConnectivity.jupyterServerIsAvailable
-          ? "#2d5f3f"
-          : "#663c00",
-        fontSize: "0.85rem",
-        textAlign: "center",
-      }}
-    >
-      {jupyterConnectivity.jupyterServerIsAvailable ? (
-        <>Jupyter server connected</>
-      ) : (
-        <>
-          Jupyter server not connected. You can still chat with the assistant,
-          but Python code execution will not be available until a connection is
-          established. Use the ⚙️ settings button below to configure.
-        </>
+  const openSettings = () => setIsSettingsOpen(true);
+  const settingsLink = (
+    <button type="button" className="chat-link-button" onClick={openSettings}>
+      Settings
+    </button>
+  );
+  const needsApiKey =
+    requiresApiKey && !hasApiKey && !chatDisabledInfo.isDisabled && !error;
+  const jupyterMissing =
+    preferences.requiresJupyter &&
+    !jupyterConnectivity.jupyterServerIsAvailable;
+
+  const newChatAction = { label: "New chat", onClick: handleNewChat };
+  const transcriptState = (
+    <>
+      {chatDisabledInfo.isDisabled && (
+        <Alert
+          status="warning"
+          title="This chat was stopped"
+          actions={[newChatAction]}
+        >
+          <p>{chatDisabledInfo.reason}</p>
+        </Alert>
       )}
-    </div>
+      {error &&
+        (LIMIT_ERROR.test(error) ? (
+          <Alert
+            status="error"
+            title="Message limit reached"
+            detail={error}
+            actions={[newChatAction]}
+          >
+            <p>The chat server is taking no more messages for now.</p>
+          </Alert>
+        ) : (
+          <Alert
+            status="error"
+            title="The answer stopped partway"
+            detail={error}
+          >
+            <p>Your question is kept above.</p>
+          </Alert>
+        ))}
+    </>
   );
 
   const composer = (
     <div className="chat-composer">
-      {error && (
-        <div
-          style={{
-            padding: "12px",
-            margin: "10px 20px",
-            backgroundColor: "#fee",
-            border: "2px solid #c00",
-            borderRadius: "4px",
-            color: "#c00",
-            fontWeight: "bold",
-            textAlign: "center",
-          }}
-        >
-          ⚠️ Error: {error}
-        </div>
-      )}
-
-      {chatDisabledInfo.isDisabled && (
-        <div
-          style={{
-            padding: "12px",
-            margin: "10px 20px",
-            backgroundColor: "#fee",
-            border: "2px solid #c00",
-            borderRadius: "4px",
-            color: "#c00",
-            fontWeight: "bold",
-            textAlign: "center",
-          }}
-        >
-          ⚠️ {chatDisabledInfo.reason}
-        </div>
-      )}
-
-      {requiresApiKey &&
-        !hasApiKey &&
-        !chatDisabledInfo.isDisabled &&
-        !error && (
-          <div
-            style={{
-              padding: "12px",
-              margin: "10px 20px",
-              backgroundColor: "#fff3cd",
-              border: "2px solid #ffc107",
-              borderRadius: "4px",
-              color: "#856404",
-              fontWeight: "bold",
-              textAlign: "center",
-            }}
-          >
-            ⚠️ This model requires an OpenRouter API key. Click the ⚙️ settings
-            button below to add your key or select a less expensive model.
-          </div>
-        )}
-
       <ChatInput
         label={`Ask ${preferences.assistantName}`}
         value={newPrompt}
@@ -544,6 +512,17 @@ const ChatPage: FunctionComponent<ChatPageProps> = ({
         }
       />
       <div className="chat-notice">
+        {needsApiKey && (
+          <InlineMessage status="warning">
+            This model needs an OpenRouter API key. Add one in {settingsLink}.
+          </InlineMessage>
+        )}
+        {jupyterMissing && (
+          <InlineMessage status="warning">
+            Python isn’t connected, so code can’t run yet. Connect a Jupyter
+            server in {settingsLink}.
+          </InlineMessage>
+        )}
         {isPreview && (
           <InlineMessage status="warning">
             This is a design preview. Sending a message won’t work here yet,
@@ -608,7 +587,6 @@ const ChatPage: FunctionComponent<ChatPageProps> = ({
 
         {isEmpty ? (
           <main className="chat-main chat-main--new">
-            {jupyterStatus}
             <NewChat
               title={
                 preferences.emptyStateTitle ??
@@ -626,7 +604,6 @@ const ChatPage: FunctionComponent<ChatPageProps> = ({
         ) : (
           <main className="chat-main">
             <div className="conversation-area" ref={conversationRef}>
-              {jupyterStatus}
               {allMessagesIncludingPartialResponse.map((xx, index) => (
                 <MessageItem
                   key={index}
@@ -643,20 +620,26 @@ const ChatPage: FunctionComponent<ChatPageProps> = ({
 
               {permissionRequest && (
                 <ToolPermissionPrompt
+                  assistantName={preferences.assistantName}
                   toolName={permissionRequest.toolName}
+                  // Tools that run code are named execute_python_code and so on.
+                  isScript={permissionRequest.toolName.startsWith("execute_")}
                   onAllow={handleAllowPermission}
                   onDeny={handleDenyPermission}
                 />
               )}
 
               {responding && !partialResponse && (
-                <div className="message message-assistant">
-                  <div className="partial-response">Thinking...</div>
-                </div>
+                <p className="chat-working" role="status">
+                  <Spinner />
+                  Working…
+                </p>
               )}
 
-              {/* Put empty space at the bottom so last message can scroll to top of visible area */}
-              <div style={{ height: "1200px" }}></div>
+              {transcriptState}
+
+              {/* Empty space at the bottom so the last message can scroll to the top. */}
+              <div className="chat-transcript-end" />
             </div>
             {composer}
           </main>
@@ -672,7 +655,7 @@ const ChatPage: FunctionComponent<ChatPageProps> = ({
             variant="ghost"
             size="sm"
             icon="settings"
-            onClick={() => setIsSettingsOpen(true)}
+            onClick={openSettings}
           >
             Settings
           </Button>
@@ -695,10 +678,7 @@ const MessageItem: FunctionComponent<{
   inProgress: boolean;
   chatId?: string;
   messageIndex: number;
-  onFeedbackUpdate: (
-    messageIndex: number,
-    feedback: { thumbs?: "up" | "down"; comment?: string },
-  ) => void;
+  onFeedbackUpdate: (messageIndex: number, feedback: Feedback) => void;
   onDeleteMessage: (messageIndex: number) => void;
 }> = ({
   message,
@@ -710,89 +690,15 @@ const MessageItem: FunctionComponent<{
   onFeedbackUpdate,
   onDeleteMessage,
 }) => {
-  const [isHovered, setIsHovered] = useState(false);
-
   if (message.role === "user") {
     return (
-      <div
-        className="message message-user"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        style={{ position: "relative" }}
-      >
-        <div className="message-bubble message-bubble-user">
-          {typeof message.content === "string" ? (
-            messageContentToString(message.content)
-          ) : Array.isArray(message.content) ? (
-            // Handle array of content parts (e.g. text + images)
-            message.content.map((part, index) => {
-              if (part.type === "text") {
-                return (
-                  <MarkdownContent
-                    key={index}
-                    content={part.text}
-                    // onSpecialLinkClicked={onSpecialLinkClicked}
-                  />
-                );
-              }
-              if (part.type === "image_url") {
-                return (
-                  <Box key={index} sx={{ mt: 1 }}>
-                    <img
-                      src={part.image_url.url}
-                      alt="Content"
-                      style={{ borderRadius: 4 }}
-                    />
-                  </Box>
-                );
-              }
-              return null;
-            })
-          ) : (
-            <>Unsupported message format</>
-          )}
-        </div>
-        {isHovered && typeof message.content === "string" && (
-          <button
-            onClick={() => onDeleteMessage(messageIndex)}
-            style={{
-              position: "absolute",
-              top: "8px",
-              right: "8px",
-              background: "rgba(255, 255, 255, 0.7)",
-              border: "1px solid rgba(0, 0, 0, 0.1)",
-              borderRadius: "4px",
-              padding: "2px 6px",
-              cursor: "pointer",
-              fontSize: "0.75rem",
-              color: "#999",
-              display: "flex",
-              alignItems: "center",
-              gap: "3px",
-              boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
-              transition: "all 0.2s",
-              opacity: 0.6,
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.opacity = "1";
-              e.currentTarget.style.background = "#fee";
-              e.currentTarget.style.borderColor = "#c00";
-              e.currentTarget.style.color = "#c00";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.opacity = "0.6";
-              e.currentTarget.style.background = "rgba(255, 255, 255, 0.7)";
-              e.currentTarget.style.borderColor = "rgba(0, 0, 0, 0.1)";
-              e.currentTarget.style.color = "#999";
-            }}
-            title="Delete this message and all messages after it"
-          >
-            🗑️
-          </button>
-        )}
-      </div>
+      <QuestionItem
+        content={message.content}
+        onDelete={() => onDeleteMessage(messageIndex)}
+      />
     );
-  } else if (message.role === "assistant") {
+  }
+  if (message.role === "assistant") {
     return (
       <AssistantMessageItem
         message={message}
@@ -805,9 +711,8 @@ const MessageItem: FunctionComponent<{
         }
       />
     );
-  } else {
-    return null;
   }
+  return null;
 };
 
 export default ChatPage;

@@ -2,6 +2,7 @@ import { Button, TextArea } from "@ui";
 import {
   FunctionComponent,
   useCallback,
+  useId,
   type FormEvent,
   type KeyboardEvent,
 } from "react";
@@ -26,6 +27,7 @@ const ChatInput: FunctionComponent<ChatInputProps> = ({
   disabled = false,
   working = false,
 }) => {
+  const helperId = useId();
   const canSend = value.trim() !== "" && !disabled && !working;
 
   const send = useCallback(() => {
@@ -56,20 +58,27 @@ const ChatInput: FunctionComponent<ChatInputProps> = ({
 
   return (
     <form className="chat-input" onSubmit={submit}>
-      <TextArea
-        label={label}
-        hideLabel
-        helper="Enter to send, Shift+Enter for a new line"
-        value={value}
-        onChange={onChange}
-        onKeyDown={sendOnEnter}
-        rows={2}
-        maxRows={8}
-        disabled={disabled}
-      />
-      <Button type="submit" variant="primary" disabled={!canSend}>
-        Send
-      </Button>
+      <div className="chat-input-row">
+        <TextArea
+          label={label}
+          hideLabel
+          placeholder={label}
+          size="lg"
+          aria-describedby={helperId}
+          value={value}
+          onChange={onChange}
+          onKeyDown={sendOnEnter}
+          rows={1}
+          maxRows={8}
+          disabled={disabled}
+        />
+        <Button type="submit" variant="primary" size="lg" disabled={!canSend}>
+          Send
+        </Button>
+      </div>
+      <p id={helperId} className="chat-input-helper">
+        Enter to send, Shift+Enter for a new line
+      </p>
     </form>
   );
 };

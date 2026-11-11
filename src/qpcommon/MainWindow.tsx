@@ -18,6 +18,10 @@ export type Preferences = {
   assistantDisplayInfo: any;
   /** The new chat's title; "Ask {assistantName}" when unset. */
   emptyStateTitle?: string;
+  /** One line under the new chat's title. */
+  emptyStateLead?: string;
+  /** An image in public/ shown before the assistant's name. */
+  logo?: string;
   suggestedPrompts: string[];
   requiresJupyter: boolean;
 };

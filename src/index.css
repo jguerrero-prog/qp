@@ -287,106 +287,6 @@ button[type="button"]:where(:not([class^="ns-"], [class*=" ns-"])) {
   display: flex;
   flex-direction: column;
 }
-
-.new-chat-container {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 0;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-.new-chat-card {
-  background: white;
-  padding: 3rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  text-align: center;
-}
-
-.new-chat-title {
-  margin: 0 0 2rem;
-  font-size: 2rem;
-  color: var(--text-color);
-  font-weight: 300;
-}
-
-.prompt-input-container {
-  position: relative;
-  margin-bottom: 2rem;
-}
-
-.prompt-textarea {
-  width: 100%;
-  min-height: 120px;
-  max-height: 300px;
-  padding: 1rem;
-  border: 2px solid var(--border-color);
-  border-radius: 8px;
-  font-family:
-    system-ui,
-    -apple-system,
-    sans-serif;
-  font-size: 1rem;
-  line-height: 1.5;
-  resize: none;
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
-  box-sizing: border-box;
-}
-
-.prompt-textarea:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
-}
-
-.prompt-textarea:disabled {
-  background-color: #f8f9fa;
-  color: #6c757d;
-  cursor: not-allowed;
-}
-
-.start-chat-button {
-  background: var(--primary-color);
-  color: white;
-  border: none;
-  padding: 0.75rem 2rem;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition:
-    background-color 0.2s ease,
-    transform 0.1s ease;
-}
-
-.start-chat-button:hover:not(:disabled) {
-  background: #0052a3;
-  transform: translateY(-1px);
-}
-
-.start-chat-button:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.conversation-area {
-  flex: 1;
-  overflow-y: auto;
-  margin-bottom: 1rem;
-  padding: 1rem;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
 .message {
   margin-bottom: 1.5rem;
   display: flex;
@@ -471,19 +371,6 @@ button[type="button"]:where(:not([class^="ns-"], [class*=" ns-"])) {
     padding: 0;
     height: 100vh;
   }
-
-  .new-chat-container {
-    padding: 1rem;
-  }
-
-  .new-chat-card {
-    padding: 2rem 1.5rem;
-  }
-
-  .new-chat-title {
-    font-size: 1.5rem;
-  }
-
   .message-bubble {
     max-width: 85%;
   }
@@ -494,24 +381,9 @@ button[type="button"]:where(:not([class^="ns-"], [class*=" ns-"])) {
     max-width: 90%;
     padding: 0.75rem 1rem;
   }
-
-  .new-chat-card {
-    padding: 1.5rem 1rem;
-  }
-
   .chat-container {
     padding: 0;
   }
-}
-
-/* Accessibility improvements */
-.prompt-textarea:focus {
-  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
-}
-
-.start-chat-button:focus {
-  outline: 2px solid var(--primary-color);
-  outline-offset: 2px;
 }
 
 /* High contrast mode support */
@@ -527,10 +399,6 @@ button[type="button"]:where(:not([class^="ns-"], [class*=" ns-"])) {
 
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
-  .start-chat-button {
-    transition: none;
-  }
-
   .partial-response::after {
     animation: none;
   }

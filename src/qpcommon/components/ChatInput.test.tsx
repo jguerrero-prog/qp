@@ -32,6 +32,13 @@ describe("ChatInput", () => {
     expect(onSubmit).toHaveBeenCalledTimes(1);
   });
 
+  it("describes the field with the keyboard helper", () => {
+    const { field } = renderInput({});
+    expect(field).toHaveAccessibleDescription(
+      "Enter to send, Shift+Enter for a new line",
+    );
+  });
+
   it("turns Send off while empty", () => {
     renderInput({ value: "  " });
     expect(screen.getByRole("button", { name: "Send" })).toBeDisabled();
@@ -47,20 +54,33 @@ describe("ChatInput", () => {
 });
 
 describe("NewChat", () => {
-  it("offers up to four prompts and sends the one chosen", () => {
+  it("shows the title and lead, holds the message box and sends a chosen prompt", () => {
     const onPrompt = vi.fn();
     render(
       <NewChat
         title="Ask Test Chat"
-        description="Assistant for testing qp."
+        lead="Assistant for testing qp."
         prompts={["a", "b", "c", "d", "e"]}
         onPrompt={onPrompt}
-      />,
+      >
+        <p>Message box</p>
+      </NewChat>,
     );
     expect(screen.getByRole("heading", { name: "Ask Test Chat" })).toBeTruthy();
+    expect(screen.getByText("Assistant for testing qp.")).toBeTruthy();
+    expect(screen.getByText("Message box")).toBeTruthy();
     const list = screen.getByRole("list", { name: "Suggested prompts" });
     expect(list.querySelectorAll("button")).toHaveLength(4);
     fireEvent.click(screen.getByRole("button", { name: "b" }));
     expect(onPrompt).toHaveBeenCalledWith("b");
+  });
+
+  it("leaves out the prompts heading when there are none", () => {
+    render(
+      <NewChat title="Ask Test Chat" prompts={[]} onPrompt={() => {}}>
+        <p>Message box</p>
+      </NewChat>,
+    );
+    expect(screen.queryByText("Suggested prompts")).toBeNull();
   });
 });

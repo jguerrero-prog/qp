@@ -19,6 +19,9 @@
 }
 
 .chat-title-text {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
   margin: 0;
   font: var(--type-h2);
   letter-spacing: var(--type-h2-letter-spacing);
@@ -27,14 +30,48 @@
 
 .chat-title-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--space-2);
   align-items: center;
 }
 
+.chat-title-logo {
+  block-size: 1.75rem;
+  inline-size: auto;
+}
+
+/* The page between the top bar and the footer. */
+.chat-main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-block-size: 0;
+}
+
+/* A new chat centers its column in the page, as Neurosift's Home does. */
+.chat-main--new {
+  padding: var(--space-8) var(--space-4);
+  overflow-y: auto;
+}
+
+.chat-composer,
 .chat-notice {
   display: grid;
   gap: var(--space-2);
-  padding: var(--space-2) var(--space-5) var(--space-3);
+}
+
+/* After the first message the box sits under the transcript, in a narrower column. */
+.chat-main:not(.chat-main--new) > .chat-composer {
+  inline-size: min(100% - 2 * var(--space-4), 760px);
+  margin-inline: auto;
+  padding-block: var(--space-3);
+}
+
+.conversation-area {
+  flex: 1;
+  min-block-size: 0;
+  padding: var(--space-4) max(var(--space-4), (100% - 760px) / 2);
+  overflow-y: auto;
 }
 
 .chat-footer {

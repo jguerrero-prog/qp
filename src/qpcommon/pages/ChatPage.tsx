@@ -443,12 +443,136 @@ const ChatPage: FunctionComponent<ChatPageProps> = ({
     return isEmpty ? <Tooltip label={emptyReason}>{button}</Tooltip> : button;
   };
 
+  const jupyterStatus = preferences.requiresJupyter && (
+    <div
+      style={{
+        padding: "8px 12px",
+        margin: "10px 20px",
+        backgroundColor: jupyterConnectivity.jupyterServerIsAvailable
+          ? "#f0f9f4"
+          : "#fff4e5",
+        border: jupyterConnectivity.jupyterServerIsAvailable
+          ? "1px solid #c6e8d5"
+          : "1px solid #ffe0b2",
+        borderRadius: "4px",
+        color: jupyterConnectivity.jupyterServerIsAvailable
+          ? "#2d5f3f"
+          : "#663c00",
+        fontSize: "0.85rem",
+        textAlign: "center",
+      }}
+    >
+      {jupyterConnectivity.jupyterServerIsAvailable ? (
+        <>Jupyter server connected</>
+      ) : (
+        <>
+          Jupyter server not connected. You can still chat with the assistant,
+          but Python code execution will not be available until a connection is
+          established. Use the ⚙️ settings button below to configure.
+        </>
+      )}
+    </div>
+  );
+
+  const composer = (
+    <div className="chat-composer">
+      {error && (
+        <div
+          style={{
+            padding: "12px",
+            margin: "10px 20px",
+            backgroundColor: "#fee",
+            border: "2px solid #c00",
+            borderRadius: "4px",
+            color: "#c00",
+            fontWeight: "bold",
+            textAlign: "center",
+          }}
+        >
+          ⚠️ Error: {error}
+        </div>
+      )}
+
+      {chatDisabledInfo.isDisabled && (
+        <div
+          style={{
+            padding: "12px",
+            margin: "10px 20px",
+            backgroundColor: "#fee",
+            border: "2px solid #c00",
+            borderRadius: "4px",
+            color: "#c00",
+            fontWeight: "bold",
+            textAlign: "center",
+          }}
+        >
+          ⚠️ {chatDisabledInfo.reason}
+        </div>
+      )}
+
+      {requiresApiKey &&
+        !hasApiKey &&
+        !chatDisabledInfo.isDisabled &&
+        !error && (
+          <div
+            style={{
+              padding: "12px",
+              margin: "10px 20px",
+              backgroundColor: "#fff3cd",
+              border: "2px solid #ffc107",
+              borderRadius: "4px",
+              color: "#856404",
+              fontWeight: "bold",
+              textAlign: "center",
+            }}
+          >
+            ⚠️ This model requires an OpenRouter API key. Click the ⚙️ settings
+            button below to add your key or select a less expensive model.
+          </div>
+        )}
+
+      <ChatInput
+        label={`Ask ${preferences.assistantName}`}
+        value={newPrompt}
+        onChange={setNewPrompt}
+        onSubmit={handleSubmit}
+        working={responding}
+        disabled={
+          chatDisabledInfo.isDisabled ||
+          !!error ||
+          (requiresApiKey && !hasApiKey)
+        }
+      />
+      <div className="chat-notice">
+        {isPreview && (
+          <InlineMessage status="warning">
+            This is a design preview. Sending a message won’t work here yet,
+            because the chat server doesn’t accept requests from this address.
+          </InlineMessage>
+        )}
+        <InlineMessage status="info">
+          Conversations are saved to help develop {preferences.assistantName}.
+          Don’t share personal or sensitive information.
+        </InlineMessage>
+      </div>
+    </div>
+  );
+
   return (
     <div className="chat-page">
       <div className="chat-container">
         <div className="chat-title-row">
           <div className="chat-title">
-            <h1 className="chat-title-text">{preferences.assistantName}</h1>
+            <h1 className="chat-title-text">
+              {preferences.logo && (
+                <img
+                  className="chat-title-logo"
+                  src={`${import.meta.env.BASE_URL}${preferences.logo}`}
+                  alt=""
+                />
+              )}
+              {preferences.assistantName}
+            </h1>
             <Badge status="neutral">Experimental</Badge>
           </div>
           <div className="chat-title-actions">
@@ -472,64 +596,30 @@ const ChatPage: FunctionComponent<ChatPageProps> = ({
           </div>
         </div>
 
-        <div className="chat-notice">
-          {isPreview && (
-            <InlineMessage status="warning">
-              This is a design preview. Sending a message won’t work here yet,
-              because the chat server doesn’t accept requests from this address.
-            </InlineMessage>
-          )}
-          <InlineMessage status="info">
-            Conversations are saved to help develop {preferences.assistantName}.
-            Don’t share personal or sensitive information.
-          </InlineMessage>
-        </div>
-
-        <div className="conversation-area" ref={conversationRef}>
-          {preferences.requiresJupyter && (
-            <div
-              style={{
-                padding: "8px 12px",
-                margin: "10px 20px",
-                backgroundColor: jupyterConnectivity.jupyterServerIsAvailable
-                  ? "#f0f9f4"
-                  : "#fff4e5",
-                border: jupyterConnectivity.jupyterServerIsAvailable
-                  ? "1px solid #c6e8d5"
-                  : "1px solid #ffe0b2",
-                borderRadius: "4px",
-                color: jupyterConnectivity.jupyterServerIsAvailable
-                  ? "#2d5f3f"
-                  : "#663c00",
-                fontSize: "0.85rem",
-                textAlign: "center",
-              }}
-            >
-              {jupyterConnectivity.jupyterServerIsAvailable ? (
-                <>Jupyter server connected</>
-              ) : (
-                <>
-                  Jupyter server not connected. You can still chat with the
-                  assistant, but Python code execution will not be available
-                  until a connection is established. Use the ⚙️ settings button
-                  below to configure.
-                </>
-              )}
-            </div>
-          )}
-          {isEmpty ? (
+        {isEmpty ? (
+          <main className="chat-main chat-main--new">
+            {jupyterStatus}
             <NewChat
               title={
                 preferences.emptyStateTitle ??
                 `Ask ${preferences.assistantName}`
               }
-              description={preferences.assistantDisplayInfo}
+              lead={
+                preferences.emptyStateLead ??
+                (typeof preferences.assistantDisplayInfo === "string"
+                  ? preferences.assistantDisplayInfo
+                  : undefined)
+              }
               prompts={preferences.suggestedPrompts}
               onPrompt={handleSuggestedPromptClick}
-              disabled={responding}
-            />
-          ) : (
-            <>
+            >
+              {composer}
+            </NewChat>
+          </main>
+        ) : (
+          <main className="chat-main">
+            <div className="conversation-area" ref={conversationRef}>
+              {jupyterStatus}
               {allMessagesIncludingPartialResponse.map((xx, index) => (
                 <MessageItem
                   key={index}
@@ -560,78 +650,10 @@ const ChatPage: FunctionComponent<ChatPageProps> = ({
 
               {/* Put empty space at the bottom so last message can scroll to top of visible area */}
               <div style={{ height: "1200px" }}></div>
-            </>
-          )}
-        </div>
-
-        {error && (
-          <div
-            style={{
-              padding: "12px",
-              margin: "10px 20px",
-              backgroundColor: "#fee",
-              border: "2px solid #c00",
-              borderRadius: "4px",
-              color: "#c00",
-              fontWeight: "bold",
-              textAlign: "center",
-            }}
-          >
-            ⚠️ Error: {error}
-          </div>
-        )}
-
-        {chatDisabledInfo.isDisabled && (
-          <div
-            style={{
-              padding: "12px",
-              margin: "10px 20px",
-              backgroundColor: "#fee",
-              border: "2px solid #c00",
-              borderRadius: "4px",
-              color: "#c00",
-              fontWeight: "bold",
-              textAlign: "center",
-            }}
-          >
-            ⚠️ {chatDisabledInfo.reason}
-          </div>
-        )}
-
-        {requiresApiKey &&
-          !hasApiKey &&
-          !chatDisabledInfo.isDisabled &&
-          !error && (
-            <div
-              style={{
-                padding: "12px",
-                margin: "10px 20px",
-                backgroundColor: "#fff3cd",
-                border: "2px solid #ffc107",
-                borderRadius: "4px",
-                color: "#856404",
-                fontWeight: "bold",
-                textAlign: "center",
-              }}
-            >
-              ⚠️ This model requires an OpenRouter API key. Click the ⚙️
-              settings button below to add your key or select a less expensive
-              model.
             </div>
-          )}
-
-        <ChatInput
-          label={`Ask ${preferences.assistantName}`}
-          value={newPrompt}
-          onChange={setNewPrompt}
-          onSubmit={handleSubmit}
-          working={responding}
-          disabled={
-            chatDisabledInfo.isDisabled ||
-            !!error ||
-            (requiresApiKey && !hasApiKey)
-          }
-        />
+            {composer}
+          </main>
+        )}
 
         <footer className="chat-footer">
           <UsageDisplay

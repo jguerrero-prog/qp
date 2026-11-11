@@ -20,7 +20,7 @@ describe("Button", () => {
     );
   });
 
-  it("takes the four styles and two sizes", () => {
+  it("takes the four styles and three sizes", () => {
     const { rerender } = render(<Button>Open file</Button>);
     for (const variant of [
       "primary",
@@ -28,7 +28,7 @@ describe("Button", () => {
       "ghost",
       "destructive",
     ] as const) {
-      for (const size of ["md", "sm"] as const) {
+      for (const size of ["lg", "md", "sm"] as const) {
         rerender(
           <Button variant={variant} size={size}>
             Open file

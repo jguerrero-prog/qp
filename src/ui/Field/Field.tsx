@@ -7,7 +7,7 @@ import { fieldMessageId } from "./fieldAria";
 interface FieldProps {
   id: string;
   label: string;
-  size: "md" | "sm";
+  size: "lg" | "md" | "sm";
   helper?: string;
   error?: string;
   /** Keeps the label for screen readers only, where a visible label nearby already names the field. */

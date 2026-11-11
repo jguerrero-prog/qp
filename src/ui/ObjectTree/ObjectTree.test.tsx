@@ -69,6 +69,36 @@ describe("ObjectRow", () => {
     ).toContain("LFP recordings");
   });
 
+  it("puts the description on the first line after the type and badge, the views below", () => {
+    const { container } = row({ badge: <span>Default units</span> });
+    const head = container.querySelector(".ns-object-head")!;
+    expect(
+      [...head.children].map((child) => child.textContent?.slice(0, 16)),
+    ).toEqual([
+      "LFPs",
+      "ElectricalSeries",
+      "Default units",
+      "These are LFP re",
+    ]);
+    expect(
+      head.compareDocumentPosition(
+        container.querySelector(".ns-object-views")!,
+      ),
+    ).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+  });
+
+  it("keeps the full description in the DOM and on hover, however it’s cut", () => {
+    const { container, description } = row();
+    const text = container.querySelector(".ns-object-description")!;
+    expect(text.textContent).toBe(description);
+    expect(text.getAttribute("title")).toBe(description);
+  });
+
+  it("leaves the description out when there is none", () => {
+    const { container } = row({ description: undefined });
+    expect(container.querySelector(".ns-object-description")).toBeNull();
+  });
+
   it("opens and closes a group from a chevron that says whether it’s open", () => {
     const { onToggle } = row({ kind: "collapsed", views: [] });
     const toggle = screen.getByRole("button", {

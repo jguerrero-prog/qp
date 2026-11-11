@@ -7,6 +7,7 @@ export { Spinner } from "./Spinner/Spinner";
 export { Checkbox } from "./Checkbox/Checkbox";
 export { SearchField } from "./SearchField/SearchField";
 export { TextInput } from "./TextInput/TextInput";
+export { TextArea } from "./TextArea/TextArea";
 export { Menu } from "./Menu/Menu";
 export type { MenuItem } from "./Menu/Menu";
 export { Select } from "./Select/Select";
@@ -96,3 +97,5 @@ export {
   SearchRow,
   ShowMore,
 } from "./Catalog/Catalog";
+export { PromptList } from "./PromptList/PromptList";
+export type { Prompt } from "./PromptList/PromptList";

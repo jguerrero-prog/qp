@@ -17,6 +17,10 @@ const suggestedPrompts = [
 
 const preferences: Preferences = {
   assistantName: "Neurosift Chat",
+  emptyStateTitle: "Ask about DANDI, EMBER and OpenNeuro datasets",
+  emptyStateLead:
+    "Search the archives, read NWB files and make figures, by asking in plain words.",
+  logo: "neurosift-logo.png",
   getAssistantSystemPrompt: async () => neurosiftChatAssistantDescription,
   assistantDisplayInfo:
     "Assistant for exploring and querying neuroscience datasets across DANDI Archive, OpenNeuro, and EBRAINS repositories, with capabilities to search datasets, analyze NWB files, and generate data visualizations.",

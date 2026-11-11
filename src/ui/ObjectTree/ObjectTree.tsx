@@ -64,7 +64,7 @@ interface ObjectRowProps {
   children?: ReactNode;
 }
 
-/** A neurodata object in the Main tab: chevron, checkbox, name, views, type and description. */
+/** A neurodata object in the Main tab: chevron, checkbox, name, type and description, then views. */
 export function ObjectRow({
   name,
   path,
@@ -123,6 +123,11 @@ export function ObjectRow({
               </span>
             )}
             {badge}
+            {description && (
+              <span className="ns-object-description" title={description}>
+                {description}
+              </span>
+            )}
           </span>
           {views.length > 0 && (
             <span className="ns-object-views">
@@ -130,9 +135,6 @@ export function ObjectRow({
                 <ViewChip key={view.name} object={name} {...view} />
               ))}
             </span>
-          )}
-          {description && (
-            <span className="ns-object-description">{description}</span>
           )}
           <span className="ns-visually-hidden">{path}</span>
         </span>

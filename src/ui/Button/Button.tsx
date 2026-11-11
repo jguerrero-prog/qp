@@ -10,7 +10,7 @@ import "../control.css";
 import "./Button.css";
 
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "destructive";
-export type ButtonSize = "md" | "sm";
+export type ButtonSize = "lg" | "md" | "sm";
 
 interface CommonProps {
   variant?: ButtonVariant;

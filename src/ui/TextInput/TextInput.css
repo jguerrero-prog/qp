@@ -1,9 +1,5 @@
-.ns-field-input,
 .ns-field-unit {
   font: var(--type-body-sm);
-}
-
-.ns-field-unit {
   color: var(--text-muted);
 }
 

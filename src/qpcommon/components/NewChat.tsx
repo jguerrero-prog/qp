@@ -6,7 +6,7 @@ const MAX_PROMPTS = 4;
 
 interface NewChatProps {
   title: string;
-  lead?: string;
+  lead?: ReactNode;
   prompts: string[];
   onPrompt: (prompt: string) => void;
   /** The message box, between the title and the prompts. */
@@ -30,7 +30,7 @@ const NewChat: FunctionComponent<NewChatProps> = ({
         <h2 id={titleId} className="new-chat-title">
           {title}
         </h2>
-        {lead && <p className="new-chat-lead">{lead}</p>}
+        {lead && <div className="new-chat-lead">{lead}</div>}
       </div>
       {children}
       {shown.length > 0 && (

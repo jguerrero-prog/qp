@@ -605,10 +605,7 @@ const ChatPage: FunctionComponent<ChatPageProps> = ({
                 `Ask ${preferences.assistantName}`
               }
               lead={
-                preferences.emptyStateLead ??
-                (typeof preferences.assistantDisplayInfo === "string"
-                  ? preferences.assistantDisplayInfo
-                  : undefined)
+                preferences.emptyStateLead ?? preferences.assistantDisplayInfo
               }
               prompts={preferences.suggestedPrompts}
               onPrompt={handleSuggestedPromptClick}

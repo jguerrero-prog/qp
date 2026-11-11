@@ -9,7 +9,9 @@
   gap: var(--space-3);
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-4) var(--space-5) 0;
+  padding: calc(var(--space-2) + var(--space-0-5)) var(--space-6);
+  background: var(--surface-panel);
+  border-block-end: var(--border-width-1) solid var(--border-strong);
 }
 
 .chat-title {
@@ -23,8 +25,8 @@
   gap: var(--space-2);
   align-items: center;
   margin: 0;
-  font: var(--type-h2);
-  letter-spacing: var(--type-h2-letter-spacing);
+  font: var(--type-h4);
+  letter-spacing: var(--type-h4-letter-spacing);
   color: var(--text-default);
 }
 
@@ -35,8 +37,9 @@
   align-items: center;
 }
 
+/* 28px, as in Neurosift's app bar. */
 .chat-title-logo {
-  block-size: 1.75rem;
+  block-size: calc(var(--icon-size-lg) + var(--space-1));
   inline-size: auto;
 }
 
@@ -76,9 +79,10 @@
 
 .chat-footer {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--space-4);
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   padding: var(--space-1) var(--space-5);
   border-block-start: var(--border-width-1) solid var(--border-subtle);
 }

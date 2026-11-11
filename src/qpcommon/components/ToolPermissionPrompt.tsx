@@ -1,4 +1,4 @@
-import { Alert, Button } from "@ui";
+import { Alert } from "@ui";
 import { FunctionComponent } from "react";
 
 interface ToolPermissionPromptProps {
@@ -24,19 +24,14 @@ const ToolPermissionPrompt: FunctionComponent<ToolPermissionPromptProps> = ({
         ? `${assistantName} wants to run a script`
         : `${assistantName} wants to use ${toolName}`
     }
+    actions={[
+      { label: "Allow", onClick: onAllow, primary: true },
+      { label: "Deny", onClick: onDeny },
+    ]}
   >
     <p>
       The assistant wants to use the tool: <strong>{toolName}</strong>
     </p>
-    {/* Alert's own actions are Secondary and Ghost; Allow has to be Primary. */}
-    <div className="ns-alert-actions">
-      <Button variant="primary" size="sm" onClick={onAllow}>
-        Allow
-      </Button>
-      <Button variant="secondary" size="sm" onClick={onDeny}>
-        Deny
-      </Button>
-    </div>
   </Alert>
 );
 

@@ -62,7 +62,7 @@ const AnswerFeedback: FunctionComponent<AnswerFeedbackProps> = ({
             key={thumbs}
             variant="secondary"
             size="sm"
-            aria-pressed={feedback?.thumbs === thumbs}
+            pressed={feedback?.thumbs === thumbs}
             onClick={() => choose(thumbs)}
           >
             {label}

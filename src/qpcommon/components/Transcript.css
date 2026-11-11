@@ -140,10 +140,6 @@
   align-items: center;
 }
 
-.chat-feedback .ns-button[aria-pressed="true"] {
-  --control-bg: var(--action-secondary-pressed);
-}
-
 .chat-feedback-note {
   margin: 0;
   color: var(--text-muted);

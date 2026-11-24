@@ -23,7 +23,7 @@ const preferences: Preferences = {
   logo: "neurosift-logo.png",
   backLink: {
     label: "Back to Neurosift",
-    href: import.meta.env.VITE_NEUROSIFT_URL || "https://neurosift.app",
+    href: import.meta.env.VITE_NEUROSIFT_URL || "https://neurosift.app/",
   },
   getAssistantSystemPrompt: async () => neurosiftChatAssistantDescription,
   assistantDisplayInfo:

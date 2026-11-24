@@ -14,6 +14,7 @@ import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import Code from "./Code";
+import { isEmbedded, isNeurosiftLink, postToHost } from "../embed";
 import "./Transcript.css";
 
 interface MarkdownContentProps {
@@ -42,7 +43,24 @@ const end = (style?: CSSProperties) =>
 
 const COMPONENTS: Components = {
   a: ({ href, title, children }) => (
-    <a href={href} title={title} target="_blank" rel="noopener noreferrer">
+    <a
+      href={href}
+      title={title}
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={(event) => {
+        // In Neurosift's panel, a link to Neurosift opens beside the chat, not in a new tab.
+        if (
+          !isEmbedded ||
+          !isNeurosiftLink(href) ||
+          event.metaKey ||
+          event.ctrlKey
+        )
+          return;
+        event.preventDefault();
+        postToHost({ type: "open-link", href: href! });
+      }}
+    >
       {children}
     </a>
   ),

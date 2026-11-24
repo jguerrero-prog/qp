@@ -8,6 +8,7 @@ import {
   useToast,
 } from "@ui";
 import { isPreview } from "../preview";
+import { fullPageHref, isEmbedded, onHostMessage, postToHost } from "../embed";
 import {
   FunctionComponent,
   useCallback,
@@ -413,6 +414,27 @@ const ChatPage: FunctionComponent<ChatPageProps> = ({
       .map((m) => m.message);
   }, [allMessagesIncludingPartialResponse]);
 
+  // Embedded in Neurosift, the host's panel header has New chat and Open in full page.
+  useEffect(
+    () =>
+      isEmbedded
+        ? onHostMessage((message) => {
+            if (message.type === "new-chat") handleNewChat();
+          })
+        : undefined,
+    [handleNewChat],
+  );
+  const messageCount = chat?.messages.length ?? 0;
+  useEffect(() => {
+    if (!isEmbedded) return;
+    const base = import.meta.env.BASE_URL;
+    postToHost({
+      type: "chat",
+      href: fullPageHref(chatId ? `${base}chat/${chatId}` : `${base}chat`),
+      empty: messageCount === 0,
+    });
+  }, [chatId, messageCount]);
+
   if (!chat && loadingChat) {
     return (
       <div className="chat-container">
@@ -538,52 +560,54 @@ const ChatPage: FunctionComponent<ChatPageProps> = ({
   );
 
   return (
-    <div className="chat-page">
+    <div className={`chat-page${isEmbedded ? " chat-page--embedded" : ""}`}>
       <div className="chat-container">
-        <div className="chat-title-row">
-          <div className="chat-title">
-            <h1 className="chat-title-text">
-              {preferences.logo && (
-                <img
-                  className="chat-title-logo"
-                  src={`${import.meta.env.BASE_URL}${preferences.logo}`}
-                  alt=""
-                />
+        {!isEmbedded && (
+          <div className="chat-title-row">
+            <div className="chat-title">
+              <h1 className="chat-title-text">
+                {preferences.logo && (
+                  <img
+                    className="chat-title-logo"
+                    src={`${import.meta.env.BASE_URL}${preferences.logo}`}
+                    alt=""
+                  />
+                )}
+                {preferences.assistantName}
+              </h1>
+              <Badge status="neutral">Experimental</Badge>
+            </div>
+            <div className="chat-title-actions">
+              {preferences.backLink && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  icon="chevron--left"
+                  href={preferences.backLink.href}
+                >
+                  {preferences.backLink.label}
+                </Button>
               )}
-              {preferences.assistantName}
-            </h1>
-            <Badge status="neutral">Experimental</Badge>
-          </div>
-          <div className="chat-title-actions">
-            {preferences.backLink && (
+              {headerAction("New chat", "add", handleNewChat)}
+              {headerAction("Download", "download", handleDownloadTranscript)}
               <Button
                 variant="ghost"
                 size="sm"
-                icon="chevron--left"
-                href={preferences.backLink.href}
+                icon="logo--github"
+                href="https://github.com/magland/qp"
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                {preferences.backLink.label}
+                Source on GitHub
               </Button>
-            )}
-            {headerAction("New chat", "add", handleNewChat)}
-            {headerAction("Download", "download", handleDownloadTranscript)}
-            <Button
-              variant="ghost"
-              size="sm"
-              icon="logo--github"
-              href="https://github.com/magland/qp"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Source on GitHub
-            </Button>
-            {isEmpty && (
-              <span id={emptyReasonId} className="ns-visually-hidden">
-                {emptyReason}
-              </span>
-            )}
+              {isEmpty && (
+                <span id={emptyReasonId} className="ns-visually-hidden">
+                  {emptyReason}
+                </span>
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
         {isEmpty ? (
           <main className="chat-main chat-main--new">
